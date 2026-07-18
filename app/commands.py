@@ -36,7 +36,14 @@ def build_reply(command: str) -> str:
 
 async def handle_update(update: dict[str, Any], settings: Settings) -> None:
     """Handle text-message updates without storing the incoming message body."""
-    message = update.get("message")
+    result = update.get("result")
+    if not isinstance(result, dict):
+        return
+
+    if result.get("event_name") != "message.text.received":
+        return
+
+    message = result.get("message")
     if not isinstance(message, dict):
         return
 
@@ -54,4 +61,3 @@ async def handle_update(update: dict[str, Any], settings: Settings) -> None:
         return
 
     await send_message(settings.bot_token, chat_id, build_reply(command))
-
